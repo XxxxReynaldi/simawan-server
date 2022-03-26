@@ -76,6 +76,7 @@ module.exports = {
 									namaLengkap: user.namaLengkap,
 									telp: user.telp,
 									foto: user.foto,
+									role: user.role,
 								},
 							},
 							config.jwtKey
