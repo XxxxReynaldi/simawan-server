@@ -18,6 +18,7 @@ const selesaiPendidikanRouter = require('./app/SelesaiPendidikan/router');
 const meninggalkanSekolahRouter = require('./app/MeninggalkanSekolah/router');
 const pelanggaranSiswaRouter = require('./app/PelanggaranSiswa/router');
 const authRouter = require('./app/Auth/router');
+const userRouter = require('./app/User/router');
 // const userRouter = require('./app/User/router');
 
 var app = express();
@@ -49,6 +50,7 @@ app.use(`${URL}/selesai-pendidikan`, selesaiPendidikanRouter);
 app.use(`${URL}/meninggalkan-sekolah`, meninggalkanSekolahRouter);
 app.use(`${URL}/pelanggaran-siswa`, pelanggaranSiswaRouter);
 app.use(`${URL}/auth`, authRouter);
+app.use(`${URL}/user`, userRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -17,7 +17,7 @@ let userSchema = mongoose.Schema(
 		role: {
 			type: String,
 			enum: ['admin', 'siswa'],
-			default: 'admin',
+			default: 'siswa',
 		},
 		status: {
 			type: String,
@@ -51,6 +51,11 @@ let userSchema = mongoose.Schema(
 			require: [true, 'nomor telpon harus diisi'],
 			maxlength: [13, 'panjang nomor telpon harus antara 9 - 13 karakter'],
 			minlength: [9, 'panjang nomor telpon harus antara 9 - 13 karakter'],
+		},
+		validasi: {
+			type: String,
+			enum: ['pending', 'valid', 'gagal'],
+			default: 'pending',
 		},
 		foto: { type: String },
 	},

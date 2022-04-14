@@ -1,4 +1,5 @@
 const User = require('./model');
+const Siswa = require('../Siswa/model');
 const bcrypt = require('bcryptjs');
 
 module.exports = {
@@ -60,5 +61,45 @@ module.exports = {
 		res.status(200).json({
 			message: 'Berhasil Logout',
 		});
+	},
+
+	validation: async (req, res, next) => {
+		try {
+			const { id } = req.params;
+			const checkUser = await User.findOne({ _id: id });
+
+			if (checkUser) {
+				let validasi = checkUser.validasi === 'pending' ? 'valid' : 'pending';
+				await User.findOneAndUpdate({ _id: id }, { validasi });
+
+				let xUser = await User.findOne({ _id: id });
+				const { namaLengkap, NISN, tempatLahir, tanggalLahir, noHp } = xUser;
+				let siswa = await Siswa({ namaLengkap, NISN, tempatLahir, tanggalLahir, noHp });
+				await siswa.save();
+
+				res.status(200).json({
+					message: 'Data berhasil diubah',
+					data: xUser,
+				});
+			}
+		} catch (err) {
+			next(err);
+		}
+	},
+
+	getValidation: async (req, res, next) => {
+		try {
+			const { validasi } = req.body;
+			const userValidasi = await User.find({ validasi, role: 'siswa' });
+			const jumlah = await User.countDocuments({ validasi, role: 'siswa' });
+
+			res.status(200).json({
+				message: `${jumlah} Data berhasil ditampilkan`,
+				count: jumlah,
+				data: userValidasi,
+			});
+		} catch (err) {
+			next(err);
+		}
 	},
 };

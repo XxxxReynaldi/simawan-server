@@ -97,14 +97,14 @@ module.exports = {
 	},
 	index: async (req, res, next) => {
 		try {
-			const siswa = await Siswa.find()
-				.populate({ path: 'akademik' })
-				.populate({ path: 'orangTuaWali' })
-				.populate({ path: 'kesehatan' })
-				.populate({ path: 'selesaiPendidikan' })
-				.populate({ path: 'perkembangan' })
-				.populate({ path: 'meninggalkanSekolah' })
-				.populate({ path: 'pelanggaran' });
+			const siswa = await Siswa.find();
+			// .populate({ path: 'akademik' })
+			// .populate({ path: 'orangTuaWali' })
+			// .populate({ path: 'kesehatan' })
+			// .populate({ path: 'selesaiPendidikan' })
+			// .populate({ path: 'perkembangan' })
+			// .populate({ path: 'meninggalkanSekolah' })
+			// .populate({ path: 'pelanggaran' });
 			res.status(200).json({
 				message: 'Data siswa berhasil ditampilkan',
 				data: siswa,
@@ -116,14 +116,14 @@ module.exports = {
 	show: async (req, res, next) => {
 		try {
 			const { id } = req.params;
-			const siswa = await Siswa.findOne({ _id: id })
-				.populate({ path: 'akademik' })
-				.populate({ path: 'orangTuaWali' })
-				.populate({ path: 'kesehatan' })
-				.populate({ path: 'selesaiPendidikan' })
-				.populate({ path: 'perkembangan' })
-				.populate({ path: 'meninggalkanSekolah' })
-				.populate({ path: 'pelanggaran' });
+			const siswa = await Siswa.findOne({ _id: id });
+			// .populate({ path: 'akademik' })
+			// .populate({ path: 'orangTuaWali' })
+			// .populate({ path: 'kesehatan' })
+			// .populate({ path: 'selesaiPendidikan' })
+			// .populate({ path: 'perkembangan' })
+			// .populate({ path: 'meninggalkanSekolah' })
+			// .populate({ path: 'pelanggaran' });
 			if (!siswa) {
 				const error = new Error('Data tidak ditemukan !');
 				error.status = 404;

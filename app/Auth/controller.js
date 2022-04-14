@@ -32,7 +32,7 @@ module.exports = {
 					} catch (err) {
 						if (err && err.name === 'ValidationError') {
 							return res.status(422).json({
-								error: 1,
+								error: true,
 								message: err.message,
 								fields: err.errors,
 							});
@@ -41,7 +41,7 @@ module.exports = {
 					}
 				});
 			} else {
-				let user = new User(payload);
+				let user = new User({ ...payload, foto: 'default.jpg' });
 				await user.save();
 
 				delete user._doc.password;
@@ -51,7 +51,7 @@ module.exports = {
 		} catch (err) {
 			if (err && err.name === 'ValidationError') {
 				return res.status(422).json({
-					error: 1,
+					error: true,
 					message: err.message,
 					fields: err.errors,
 				});
@@ -72,7 +72,7 @@ module.exports = {
 							{
 								user: {
 									id: user.id,
-									email: user.email,
+									// email: user.email,
 									namaLengkap: user.namaLengkap,
 									telp: user.telp,
 									foto: user.foto,

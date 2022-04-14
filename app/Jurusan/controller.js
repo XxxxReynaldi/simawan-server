@@ -6,7 +6,8 @@ const config = require('../../config');
 module.exports = {
 	store: async (req, res, next) => {
 		try {
-			const { kode, bidangKeahlian, programKeahlian, paketKeahlian, singkatan, warna } = req.body;
+			const { kode, bidangKeahlian, programKeahlian, paketKeahlian, singkatan, status, warna } =
+				req.body;
 
 			const checkKode = await Jurusan.findOne({ kode });
 			if (checkKode) {
@@ -36,6 +37,7 @@ module.exports = {
 							paketKeahlian,
 							singkatan,
 							warna,
+							status,
 							foto: filename,
 						});
 						await jurusan.save();
@@ -56,6 +58,7 @@ module.exports = {
 					paketKeahlian,
 					singkatan,
 					warna,
+					status,
 					foto: 'default.png',
 				});
 				await jurusan.save();
@@ -71,9 +74,11 @@ module.exports = {
 	index: async (req, res, next) => {
 		try {
 			const jurusan = await Jurusan.find();
+			const countJurusan = await Jurusan.countDocuments();
 			res.status(200).json({
 				message: 'Data jurusan berhasil ditampilkan',
 				data: jurusan,
+				total: countJurusan,
 			});
 		} catch (err) {
 			next(err);
@@ -99,18 +104,12 @@ module.exports = {
 	update: async (req, res, next) => {
 		try {
 			const { id } = req.params;
-			const { kode, bidangKeahlian, programKeahlian, paketKeahlian, singkatan, warna } = req.body;
+			const { kode, bidangKeahlian, programKeahlian, paketKeahlian, singkatan, status, warna } =
+				req.body;
 
 			const jurusan = await Jurusan.findOne({ _id: id });
 			if (!jurusan) {
 				const error = new Error('Data tidak ditemukan !');
-				error.status = 404;
-				throw error;
-			}
-
-			const checkKode = await Jurusan.findOne({ kode });
-			if (checkKode) {
-				const error = new Error('Kode sudah terpakai, gunakan kode lain');
 				error.status = 404;
 				throw error;
 			}
@@ -143,6 +142,7 @@ module.exports = {
 								paketKeahlian,
 								singkatan,
 								warna,
+								status,
 								foto: filename,
 							}
 						);
@@ -167,6 +167,7 @@ module.exports = {
 						paketKeahlian,
 						singkatan,
 						warna,
+						status,
 						foto: jurusan.foto,
 					}
 				);
