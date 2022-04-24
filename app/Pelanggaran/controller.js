@@ -18,9 +18,12 @@ module.exports = {
 	index: async (req, res, next) => {
 		try {
 			const pelanggaran = await Pelanggaran.find();
+			const countPelanggaran = await Pelanggaran.countDocuments();
+
 			res.status(200).json({
 				message: 'Data pelanggaran berhasil ditampilkan',
 				data: pelanggaran,
+				total: countPelanggaran,
 			});
 		} catch (err) {
 			next(err);

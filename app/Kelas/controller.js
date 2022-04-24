@@ -6,8 +6,8 @@ module.exports = {
 		try {
 			const { kode, tingkatan, keahlian, abjad, tahunAjaran, keterangan, status } = req.body;
 
-			const checkKode = await Kelas.findOne({ kode });
-			if (checkKode) {
+			const isKode = await Kelas.findOne({ kode });
+			if (isKode) {
 				const error = {
 					status: 404,
 					errors: {
@@ -20,11 +20,11 @@ module.exports = {
 				throw error;
 			}
 
-			const checkKelas = await Kelas.findOne({ tingkatan, keahlian, abjad, tahunAjaran });
-			if (checkKelas) {
+			const isKelas = await Kelas.findOne({ tingkatan, keahlian, abjad, tahunAjaran });
+			if (isKelas) {
 				const error = {
 					status: 404,
-					data: checkKelas,
+					data: isKelas,
 					errors: {
 						tingkatan: {
 							kind: 'duplicate',
@@ -127,11 +127,11 @@ module.exports = {
 				throw error;
 			}
 
-			// const checkKelas = await Kelas.findOne({ tingkatan, keahlian, abjad, tahunAjaran });
-			// if (checkKelas) {
+			// const isKelas = await Kelas.findOne({ tingkatan, keahlian, abjad, tahunAjaran });
+			// if (isKelas) {
 			// 	const error = new Error('Data sudah ada');
 			// 	error.status = 404;
-			// 	error.data = checkKelas;
+			// 	error.data = isKelas;
 			// 	throw error;
 			// }
 
@@ -187,11 +187,11 @@ module.exports = {
 			next(err);
 		}
 	},
-	checkKode: async (req, res, next) => {
+	isKode: async (req, res, next) => {
 		try {
 			const { kode } = req.body;
-			const checkKode = await Kelas.findOne({ kode });
-			if (checkKode) {
+			const isKode = await Kelas.findOne({ kode });
+			if (isKode) {
 				const error = new Error('Kode sudah terpakai, gunakan kode lain');
 				error.status = 404;
 				throw error;

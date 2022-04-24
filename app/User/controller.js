@@ -1,6 +1,11 @@
 const User = require('./model');
+const path = require('path');
+const fs = require('fs');
+const config = require('../../config');
+
 const Siswa = require('../Siswa/model');
 const bcrypt = require('bcryptjs');
+const HASH_ROUND = 10;
 
 module.exports = {
 	index: async (req, res) => {
@@ -63,18 +68,170 @@ module.exports = {
 		});
 	},
 
+	showProfile: async (req, res, next) => {
+		try {
+			const { id } = req.params;
+			const isUser = await User.findOne({ _id: id });
+
+			if (!isUser) {
+				const error = new Error('Data tidak ditemukan !');
+				error.status = 404;
+				throw error;
+			}
+			delete isUser._doc.password;
+
+			res.status(200).json({
+				message: 'Data berhasil ditampilkan',
+				data: isUser,
+			});
+		} catch (err) {
+			next(err);
+		}
+	},
+
+	updatePhoto: async (req, res, next) => {
+		try {
+			const { id } = req.params;
+
+			const user = await User.findOne({ _id: id });
+			if (!user) {
+				const error = new Error('Data tidak ditemukan !');
+				error.status = 404;
+				throw error;
+			}
+
+			if (req.file) {
+				let filepath = req.file.path;
+				let filename = `${new Date().getTime()}-${req.file.originalname}`;
+				let target_path = path.resolve(config.rootPath, `public/images/user/${filename}`);
+
+				const src = fs.createReadStream(filepath);
+				const dest = fs.createWriteStream(target_path);
+
+				src.pipe(dest);
+
+				src.on('end', async () => {
+					try {
+						let currentImage = `${config.rootPath}/public/images/user/${user.foto}`;
+						if (user.foto !== 'default.jpg') {
+							if (fs.existsSync(currentImage)) {
+								fs.unlinkSync(currentImage);
+							}
+						}
+
+						await User.findOneAndUpdate({ _id: id }, { foto: filename });
+
+						let xUser = await User.findOne({ _id: id });
+
+						res.status(200).json({
+							message: 'Data berhasil diperbarui',
+							data: xUser,
+						});
+					} catch (err) {
+						next(err);
+					}
+				});
+			}
+		} catch (err) {
+			next(err);
+		}
+	},
+
+	updateProfile: async (req, res, next) => {
+		try {
+			const { id } = req.params;
+			const { namaLengkap, email } = req.body;
+
+			const isUser = await User.findOne({ _id: id });
+			if (!isUser) {
+				const error = new Error('Data tidak ditemukan !');
+				error.status = 404;
+				throw error;
+			}
+
+			const isEmail = await User.findOne({ _id: id, email });
+			if (!isEmail) {
+				const hasUser = await User.findOne({ email });
+				if (hasUser) {
+					const error = {
+						status: 404,
+						data: hasUser,
+						errors: { email: { kind: 'duplicate', message: 'Data sudah ada' } },
+					};
+					throw error;
+				}
+				await User.findOneAndUpdate({ _id: id }, { namaLengkap, email });
+				let updatedUser = await User.findOne({ _id: id });
+				res.status(200).json({
+					message: 'Data berhasil diperbarui',
+					data: updatedUser,
+				});
+			}
+			if (isEmail.email === email) {
+				await User.findOneAndUpdate({ _id: id }, { namaLengkap });
+				let updatedUser = await User.findOne({ _id: id });
+				res.status(200).json({
+					message: 'Data berhasil diperbarui',
+					data: updatedUser,
+				});
+			}
+		} catch (err) {
+			next(err);
+		}
+	},
+
+	updatePassword: async (req, res, next) => {
+		try {
+			const { id } = req.params;
+			const { oldPassword, newPassword, confirmPass } = req.body;
+			const user = await User.findOne({ _id: id });
+			if (!user) {
+				res.status(404).json({
+					message: 'Data tidak ditemukan !',
+				});
+			}
+			const checkPassword = bcrypt.compareSync(oldPassword, user.password);
+			if (!checkPassword) {
+				res.status(403).json({
+					message: 'password yang anda masukan salah.',
+					fields: { oldPassword: { message: 'password yang anda masukan salah.' } },
+				});
+			}
+
+			if (newPassword !== confirmPass) {
+				res.status(403).json({
+					message: 'password yang anda masukan tidak sama.',
+					fields: { confirmPass: { message: 'password yang anda masukan tidak sama.' } },
+				});
+			}
+
+			const password = bcrypt.hashSync(newPassword, HASH_ROUND);
+			await User.findOneAndUpdate({ _id: id }, { password });
+
+			let updatedUser = await User.findOne({ _id: id });
+			res.status(200).json({
+				message: 'Data berhasil diperbarui',
+				data: updatedUser,
+			});
+		} catch (err) {
+			next(err);
+		}
+	},
+
 	validation: async (req, res, next) => {
 		try {
 			const { id } = req.params;
-			const checkUser = await User.findOne({ _id: id });
+			const { kelas } = req.body;
 
-			if (checkUser) {
-				let validasi = checkUser.validasi === 'pending' ? 'valid' : 'pending';
+			const isUser = await User.findOne({ _id: id });
+
+			if (isUser) {
+				let validasi = isUser.validasi === 'pending' ? 'valid' : 'pending';
 				await User.findOneAndUpdate({ _id: id }, { validasi });
 
 				let xUser = await User.findOne({ _id: id });
 				const { namaLengkap, NISN, tempatLahir, tanggalLahir, noHp } = xUser;
-				let siswa = await Siswa({ namaLengkap, NISN, tempatLahir, tanggalLahir, noHp });
+				let siswa = await Siswa({ namaLengkap, NISN, tempatLahir, tanggalLahir, noHp, kelas });
 				await siswa.save();
 
 				res.status(200).json({

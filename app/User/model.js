@@ -91,4 +91,11 @@ userSchema.pre('save', function (next) {
 	next();
 });
 
+// userSchema.pre('findOneAndUpdate', function (next) {
+// 	console.log('findOneAndUpdate');
+// 	this.password = bcrypt.hashSync(this.password, HASH_ROUND);
+// 	console.log('this.password', this.password);
+// 	next();
+// });
+
 module.exports = mongoose.model('User', userSchema);

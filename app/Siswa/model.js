@@ -168,6 +168,10 @@ let siswaSchema = mongoose.Schema(
 			pelanggaran: { type: mongoose.Schema.Types.ObjectId, ref: 'Pelanggaran' },
 			tindakan: { type: String },
 		},
+		kelas: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Kelas',
+		},
 	},
 	{ timestamps: true }
 );

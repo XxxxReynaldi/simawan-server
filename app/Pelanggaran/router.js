@@ -5,7 +5,8 @@ const { store, index, show, update, destroy } = require('./controller');
 const { isLoginUser } = require('../middleware/auth');
 
 /* pelanggaran page. */
-router.get('/', isLoginUser, index);
+// router.get('/', isLoginUser, index);
+router.get('/', index);
 router.post('/store', store);
 router.get('/show/:id', show);
 router.patch('/update/:id', update);
