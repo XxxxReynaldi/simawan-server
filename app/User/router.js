@@ -10,6 +10,9 @@ const {
 	updateProfile,
 	updatePassword,
 	updatePhoto,
+	generateNIS,
+	destroy,
+	removePhoto,
 } = require('./controller');
 const multer = require('multer');
 const os = require('os');
@@ -31,6 +34,7 @@ router.post('/', actionSignin); //tidak dipakai
 router.get('/show-profile/:id', showProfile);
 router.get('/logout', actionLogout);
 router.post('/validation', getValidation);
+router.post('/generate-nis', generateNIS);
 router.patch('/validation/:id', validation);
 router.patch('/update-profile/:id', updateProfile);
 router.patch('/update-password/:id', updatePassword);
@@ -39,4 +43,7 @@ router.patch(
 	multer({ dest: os.tmpdir(), fileFilter: fileFilter }).single('foto'),
 	updatePhoto
 );
+router.patch('/remove-photo/:id', removePhoto);
+router.delete('/destroy/:id', destroy);
+
 module.exports = router;

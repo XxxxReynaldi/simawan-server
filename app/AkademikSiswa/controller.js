@@ -16,6 +16,7 @@ module.exports = {
 				tanggalSTL,
 				paketKeahlian,
 				tanggalDiTerima,
+				tahunDiTerima,
 				dariSekolah,
 				alasan,
 			} = req.body;
@@ -48,6 +49,7 @@ module.exports = {
 							penerimaan: {
 								paketKeahlian,
 								tanggalDiTerima,
+								tahunDiTerima,
 								dataSekolahPindahan: { dariSekolah, alasan },
 							},
 						});
@@ -63,7 +65,12 @@ module.exports = {
 			} else {
 				const akademikSiswa = await AkademikSiswa({
 					asalSekolah: { namaSekolah, alamatSekolah, lamaBelajar, tanggalIjazah, noIjazah, tanggalSTL },
-					penerimaan: { paketKeahlian, tanggalDiTerima, dataSekolahPindahan: { dariSekolah, alasan } },
+					penerimaan: {
+						paketKeahlian,
+						tanggalDiTerima,
+						tahunDiTerima,
+						dataSekolahPindahan: { dariSekolah, alasan },
+					},
 				});
 				await akademikSiswa.save();
 				res.status(201).json({
@@ -127,6 +134,7 @@ module.exports = {
 				tanggalSTL,
 				paketKeahlian,
 				tanggalDiTerima,
+				tahunDiTerima,
 				dariSekolah,
 				alasan,
 			} = req.body;
@@ -173,6 +181,7 @@ module.exports = {
 								penerimaan: {
 									paketKeahlian,
 									tanggalDiTerima,
+									tahunDiTerima,
 									dataSekolahPindahan: { dariSekolah, alasan },
 								},
 							},
@@ -204,6 +213,7 @@ module.exports = {
 							penerimaan: {
 								paketKeahlian,
 								tanggalDiTerima,
+								tahunDiTerima,
 								dataSekolahPindahan: { dariSekolah, alasan },
 							},
 						},

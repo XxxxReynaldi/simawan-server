@@ -4,7 +4,7 @@ const { store, index, show, update, destroy, actStatus, isKode, find } = require
 
 /* kelas page. */
 router.get('/', index);
-router.get('/find/:tahunAjaran/:tingkatan', find);
+router.get('/find/:tahunAjaran/:tingkatan?', find);
 router.post('/store', store);
 router.get('/show/:id', show);
 router.patch('/update/:id', update);

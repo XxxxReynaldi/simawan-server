@@ -62,7 +62,6 @@ module.exports = {
 
 	signin: (req, res, next) => {
 		const { email, password } = req.body;
-
 		User.findOne({ email: email })
 			.then((user) => {
 				if (user) {

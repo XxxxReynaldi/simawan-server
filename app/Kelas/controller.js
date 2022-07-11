@@ -1,5 +1,5 @@
 const Kelas = require('./model');
-// const Jurusan = require('../Jurusan/model');
+const Siswa = require('../Siswa/model');
 
 module.exports = {
 	store: async (req, res, next) => {
@@ -11,10 +11,7 @@ module.exports = {
 				const error = {
 					status: 404,
 					errors: {
-						kode: {
-							kind: 'duplicate',
-							message: 'Kode sudah terpakai, gunakan kode lain',
-						},
+						kode: { kind: 'duplicate', message: 'Kode sudah terpakai, gunakan kode lain' },
 					},
 				};
 				throw error;
@@ -26,22 +23,10 @@ module.exports = {
 					status: 404,
 					data: isKelas,
 					errors: {
-						tingkatan: {
-							kind: 'duplicate',
-							message: 'Data sudah ada',
-						},
-						keahlian: {
-							kind: 'duplicate',
-							message: 'Data sudah ada',
-						},
-						abjad: {
-							kind: 'duplicate',
-							message: 'Data sudah ada',
-						},
-						tahunAjaran: {
-							kind: 'duplicate',
-							message: 'Data sudah ada',
-						},
+						tingkatan: { kind: 'duplicate', message: 'Data sudah ada' },
+						keahlian: { kind: 'duplicate', message: 'Data sudah ada' },
+						abjad: { kind: 'duplicate', message: 'Data sudah ada' },
+						tahunAjaran: { kind: 'duplicate', message: 'Data sudah ada' },
 					},
 				};
 				throw error;
@@ -69,7 +54,7 @@ module.exports = {
 		try {
 			const kelas = await Kelas.find().populate({
 				path: 'keahlian',
-				select: ['paketKeahlian', 'singkatan', 'warna'],
+				select: ['paketKeahlian', 'singkatan', 'warna', 'kode'],
 			});
 			const countKelas = await Kelas.countDocuments();
 			res.status(200).json({
@@ -84,16 +69,30 @@ module.exports = {
 	find: async (req, res, next) => {
 		try {
 			const { tahunAjaran, tingkatan } = req.params;
-			const kelas = await Kelas.find({ tahunAjaran, tingkatan }).populate({
-				path: 'keahlian',
-				select: ['paketKeahlian', 'singkatan', 'warna'],
-			});
-			const countKelas = await Kelas.countDocuments({ tahunAjaran, tingkatan });
-			res.status(200).json({
-				message: `${countKelas} Data kelas berhasil ditampilkan`,
-				data: kelas,
-				total: countKelas,
-			});
+			if (tahunAjaran && tingkatan === undefined) {
+				const kelas = await Kelas.find({ tahunAjaran, status: 'Y' }).populate({
+					path: 'keahlian',
+					select: ['paketKeahlian', 'singkatan', 'warna'],
+				});
+				const countKelas = await Kelas.countDocuments({ tahunAjaran, status: 'Y' });
+				res.status(200).json({
+					message: `${countKelas} Data kelas berhasil ditampilkan`,
+					data: kelas,
+					total: countKelas,
+				});
+			}
+			if (tahunAjaran && tingkatan) {
+				const kelas = await Kelas.find({ tahunAjaran, tingkatan, status: 'Y' }).populate({
+					path: 'keahlian',
+					select: ['paketKeahlian', 'singkatan', 'warna'],
+				});
+				const countKelas = await Kelas.countDocuments({ tahunAjaran, tingkatan, status: 'Y' });
+				res.status(200).json({
+					message: `${countKelas} Data kelas berhasil ditampilkan`,
+					data: kelas,
+					total: countKelas,
+				});
+			}
 		} catch (err) {
 			next(err);
 		}
@@ -127,32 +126,61 @@ module.exports = {
 				throw error;
 			}
 
-			// const isKelas = await Kelas.findOne({ tingkatan, keahlian, abjad, tahunAjaran });
-			// if (isKelas) {
-			// 	const error = new Error('Data sudah ada');
-			// 	error.status = 404;
-			// 	error.data = isKelas;
-			// 	throw error;
-			// }
+			const isSameDoc = await Kelas.findOne({ _id: id, kode });
+			if (!isSameDoc) {
+				const hasKelas = await Kelas.findOne({ kode });
+				if (hasKelas) {
+					const error = {
+						status: 404,
+						data: hasKelas,
+						errors: { kode: { kind: 'duplicate', message: 'Data sudah ada' } },
+					};
+					throw error;
+				}
+				await Kelas.findOneAndUpdate(
+					{ _id: id },
+					{ kode, tingkatan, keahlian, abjad, tahunAjaran, keterangan, status }
+				);
+				let updatedKelas = await Kelas.findOne({ _id: id });
+				res.status(200).json({
+					message: 'Data berhasil diperbarui',
+					data: updatedKelas,
+				});
+			}
 
-			await Kelas.findOneAndUpdate(
-				{ _id: id },
-				{
-					kode,
+			if (isSameDoc.kode === kode) {
+				const isKelas = await Kelas.findOne({
 					tingkatan,
 					keahlian,
 					abjad,
 					tahunAjaran,
 					keterangan,
 					status,
+				});
+				if (isKelas) {
+					const error = {
+						status: 404,
+						data: isKelas,
+						errors: {
+							tingkatan: { kind: 'duplicate', message: 'Data sudah ada' },
+							keahlian: { kind: 'duplicate', message: 'Data sudah ada' },
+							abjad: { kind: 'duplicate', message: 'Data sudah ada' },
+							tahunAjaran: { kind: 'duplicate', message: 'Data sudah ada' },
+						},
+					};
+					throw error;
 				}
-			);
+				await Kelas.findOneAndUpdate(
+					{ _id: id },
+					{ tingkatan, keahlian, abjad, tahunAjaran, keterangan, status }
+				);
 
-			let xKelas = await Kelas.findOne({ _id: id });
-			res.status(200).json({
-				message: 'Data berhasil diperbarui',
-				data: xKelas,
-			});
+				let updatedKelas = await Kelas.findOne({ _id: id });
+				res.status(200).json({
+					message: 'Data berhasil diperbarui',
+					data: updatedKelas,
+				});
+			}
 		} catch (err) {
 			next(err);
 		}

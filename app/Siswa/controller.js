@@ -97,7 +97,16 @@ module.exports = {
 	},
 	index: async (req, res, next) => {
 		try {
-			const siswa = await Siswa.find();
+			const siswa = await Siswa.find().populate({
+				path: 'kelas',
+				select: ['tingkatan', 'keahlian', 'abjad'],
+				populate: {
+					path: 'keahlian',
+					model: 'Jurusan',
+					select: ['paketKeahlian', 'singkatan', 'warna'],
+				},
+			});
+
 			// .populate({ path: 'akademik' })
 			// .populate({ path: 'orangTuaWali' })
 			// .populate({ path: 'kesehatan' })
@@ -105,8 +114,11 @@ module.exports = {
 			// .populate({ path: 'perkembangan' })
 			// .populate({ path: 'meninggalkanSekolah' })
 			// .populate({ path: 'pelanggaran' });
+
+			const totalSiswa = await Siswa.countDocuments();
 			res.status(200).json({
 				message: 'Data siswa berhasil ditampilkan',
+				total: totalSiswa,
 				data: siswa,
 			});
 		} catch (err) {
@@ -290,15 +302,6 @@ module.exports = {
 				error.status = 404;
 				throw error;
 			}
-		} catch (err) {
-			next(err);
-		}
-	},
-	generateNIS: async (req, res, next) => {
-		try {
-			const { tahunAjaran, keahlian } = req.body;
-
-			const siswa = await Siswa.findOne({ tahunAjaran, keahlian });
 		} catch (err) {
 			next(err);
 		}

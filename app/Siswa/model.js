@@ -89,6 +89,7 @@ let siswaSchema = mongoose.Schema(
 			penerimaan: {
 				paketKeahlian: { type: String },
 				tanggalDiTerima: { type: Date },
+				tahunDiTerima: { type: String },
 				dataSekolahPindahan: {
 					dariSekolah: { type: String },
 					alasan: { type: String },
@@ -172,6 +173,10 @@ let siswaSchema = mongoose.Schema(
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'Kelas',
 		},
+		user: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'User',
+		}
 	},
 	{ timestamps: true }
 );

@@ -26,6 +26,10 @@ let kelasSchema = mongoose.Schema(
 		keterangan: {
 			type: String,
 		},
+		jumlahSiswa: {
+			type: Number,
+			default: 0,
+		},
 		status: {
 			type: String,
 			enum: ['Y', 'N'],
