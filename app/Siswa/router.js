@@ -3,6 +3,7 @@ var router = express.Router();
 const { store, index, show, update, destroy, actStatus, checkKode } = require('./controller');
 const multer = require('multer');
 const os = require('os');
+const { find } = require('./model');
 
 const fileFilter = (req, file, cb) => {
 	if (
@@ -18,6 +19,7 @@ const fileFilter = (req, file, cb) => {
 
 /* siswa page. */
 router.get('/', index);
+router.get('/find/:tahunAjaran/:kelas?', find);
 router.post('/store', multer({ dest: os.tmpdir(), fileFilter: fileFilter }).single('foto'), store);
 router.get('/show/:id', show);
 router.patch(
