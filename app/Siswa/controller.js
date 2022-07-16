@@ -129,26 +129,36 @@ module.exports = {
 		try {
 			const { tahunAjaran, kelas } = req.params;
 			if (tahunAjaran && kelas === undefined) {
-				const kelas = await Siswa.find({ tahunAjaran, status: 'Y' }).populate({
-					path: 'keahlian',
-					select: ['paketKeahlian', 'singkatan', 'warna'],
+				const siswa = await Siswa.find({ tahunAjaran, status: 'Y' }).populate({
+					path: 'kelas',
+					select: ['tingkatan', 'keahlian', 'abjad'],
+					populate: {
+						path: 'keahlian',
+						model: 'Jurusan',
+						select: ['paketKeahlian', 'singkatan', 'warna'],
+					},
 				});
 				const countSiswa = await Siswa.countDocuments({ tahunAjaran, status: 'Y' });
 				res.status(200).json({
-					message: `${countSiswa} Data kelas berhasil ditampilkan`,
-					data: kelas,
+					message: `${countSiswa} Data siswa berhasil ditampilkan`,
+					data: siswa,
 					total: countSiswa,
 				});
 			}
 			if (tahunAjaran && kelas) {
-				const kelas = await Siswa.find({ tahunAjaran, kelas, status: 'Y' }).populate({
-					path: 'keahlian',
-					select: ['paketKeahlian', 'singkatan', 'warna'],
+				const siswa = await Siswa.find({ tahunAjaran, kelas, status: 'Y' }).populate({
+					path: 'kelas',
+					select: ['tingkatan', 'keahlian', 'abjad'],
+					populate: {
+						path: 'keahlian',
+						model: 'Jurusan',
+						select: ['paketKeahlian', 'singkatan', 'warna'],
+					},
 				});
 				const countSiswa = await Siswa.countDocuments({ tahunAjaran, kelas, status: 'Y' });
 				res.status(200).json({
-					message: `${countSiswa} Data kelas berhasil ditampilkan`,
-					data: kelas,
+					message: `${countSiswa} Data siswa berhasil ditampilkan`,
+					data: siswa,
 					total: countSiswa,
 				});
 			}
