@@ -1,9 +1,8 @@
 var express = require('express');
 var router = express.Router();
-const { store, index, show, update, destroy, actStatus, checkKode } = require('./controller');
+const { store, index, show, update, destroy, actStatus, checkKode, find } = require('./controller');
 const multer = require('multer');
 const os = require('os');
-const { find } = require('./model');
 
 const fileFilter = (req, file, cb) => {
 	if (
