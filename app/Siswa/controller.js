@@ -125,6 +125,37 @@ module.exports = {
 			next(err);
 		}
 	},
+	find: async (req, res, next) => {
+		try {
+			const { tahunAjaran, kelas } = req.params;
+			if (tahunAjaran && kelas === undefined) {
+				const kelas = await Siswa.find({ tahunAjaran, status: 'Y' }).populate({
+					path: 'keahlian',
+					select: ['paketKeahlian', 'singkatan', 'warna'],
+				});
+				const countSiswa = await Siswa.countDocuments({ tahunAjaran, status: 'Y' });
+				res.status(200).json({
+					message: `${countSiswa} Data kelas berhasil ditampilkan`,
+					data: kelas,
+					total: countSiswa,
+				});
+			}
+			if (tahunAjaran && kelas) {
+				const kelas = await Siswa.find({ tahunAjaran, kelas, status: 'Y' }).populate({
+					path: 'keahlian',
+					select: ['paketKeahlian', 'singkatan', 'warna'],
+				});
+				const countSiswa = await Siswa.countDocuments({ tahunAjaran, kelas, status: 'Y' });
+				res.status(200).json({
+					message: `${countSiswa} Data kelas berhasil ditampilkan`,
+					data: kelas,
+					total: countSiswa,
+				});
+			}
+		} catch (err) {
+			next(err);
+		}
+	},
 	show: async (req, res, next) => {
 		try {
 			const { id } = req.params;
